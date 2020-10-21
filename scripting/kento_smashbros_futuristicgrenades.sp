@@ -124,6 +124,8 @@ ConVar g_ImplosionBounce;
 ConVar g_ImplosionBounceVelocity;
 ConVar g_ImplosionMode;
 
+bool bLibraryExists;
+
 public Plugin myinfo = 
 {
 	name = "[CS:GO] Super Smash Bros Item - Futuristic Grenades",
@@ -135,6 +137,8 @@ public Plugin myinfo =
 
 public void OnPluginStart()
 {
+	bLibraryExists = LibraryExists("kento_smashbros");
+
 	g_Game = GetEngineVersion();
 	if(g_Game != Engine_CSGO)
 	{
@@ -220,6 +224,27 @@ public void OnPluginStart()
 	g_hBlackholes = new ArrayList();
 	g_hForcefields = new ArrayList();
 	AutoExecConfig(true, "futuristicgrenades");
+}
+
+public void OnLibraryAdded(const char [] name)
+{
+  if (StrEqual(name, "kento_smashbros"))
+  {
+    bLibraryExists = true;
+  }
+}
+
+public void OnAllPluginsLoaded()
+{
+  bLibraryExists = LibraryExists("kento_smashbros");
+}
+
+public void OnLibraryRemoved(const char [] name)
+{
+  if (StrEqual(name, "kento_smashbros"))
+  {
+    bLibraryExists = false;
+  }
 }
 
 public void ShakeScreen(int client, float intensity, float duration, float frequency)
@@ -406,6 +431,8 @@ void PushPlayersAwayFromForceField(int client, int iForcefield)
 
 void PushPlayersToBlackHole(int client, int owner, int iBlackhole)
 {
+	if(!bLibraryExists) return;
+	
 	if(IsValidEntity(iBlackhole))
 	{
 		float clientPos[3], blackholePos[3];
@@ -1502,6 +1529,8 @@ public void OnMapStart()
 
 public Action SB_OnItemSpawn (const char[] name, float pos[3])
 {
+	if(!bLibraryExists) return;
+	
 	float newpos[3];
 	newpos[0] = pos[0];
 	newpos[1] = pos[1];
